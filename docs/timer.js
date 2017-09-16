@@ -214,7 +214,7 @@ function setDuration1(e) {
     console.log("m.round : %f", Math.round(m));
     duration = Math.PI * Math.round(m) / 30 - Math.PI / 2;
     set_duration = true;
-    document.getElementById( 'sound-file' ).play();
+    document.getElementById( 'sound-file' ).load();
   } else {
     set_duration = false;
   }
