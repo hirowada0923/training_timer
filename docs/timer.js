@@ -6,10 +6,13 @@ var work = 20;
 
 var duration = 0;
 var center1;
+var centerx;
+var centery;
 
 var set_duration = false;
 
-canvas.addEventListener('click', setDuration, false);
+//canvas.addEventListener('click', setDuration, false);
+canvas.addEventListener('click', setDuration1, false);
 canvas.addEventListener('contextmenu', resetDuration, false);
 
 // 時計を毎秒描画する
@@ -91,6 +94,8 @@ function draw() {
         y: Math.floor(canvas.height / 2)
     };
     center1 = center.x;
+    centerx = center.x;
+    centery = center.y;
     var radius = Math.min(center.x, center.y);
     var angle;
     var len;
@@ -127,20 +132,22 @@ function draw() {
 
     // 作業時間・休憩時間を描画する
     angle = Math.PI * (m + s / 60) / 30 - Math.PI / 2;
+//    angle = Math.PI * s / 30 - Math.PI / 2;
+
     if (set_duration == true) {
-      if (angle < duration) {
-        context.beginPath();
-    	context.fillStyle = circle.duration.color;
-	if (duration - angle >= Math.PI * 2) {
-          duration = duration - Math.PI * 2
+        if (angle != duration) {
+          context.beginPath();
+          context.fillStyle = circle.duration.color;
+//          if (duration - angle >= Math.PI * 2) {
+//            duration = duration - Math.PI * 2
+//          }
+          context.arc(center.x, center.y, radius * circle.inner.radius, angle, duration, false);
+          context.lineTo(center.x, center.y);
+          context.fill();
+        } else {
+          play_desk_bell();
+          set_duration = false;
         }
-        context.arc(center.x, center.y, radius * circle.inner.radius, angle, duration, false);
-    	context.lineTo(center.x, center.y)
-    	context.fill();
-      } else {
-        play_desk_bell();
-        set_duration = false;
-      }
     }
 
     // 時針を描画する
@@ -189,7 +196,28 @@ function setDuration(e) {
   var m1 = date1.getMinutes();
   var s1 = date1.getSeconds();
   duration = Math.PI * (m1 + s1 / 60) / 30 - Math.PI / 2 + Math.PI / 30 * interval;
+//  duration = Math.PI * s1 / 30 - Math.PI / 2 + Math.PI / 30 * interval;
+
   set_duration = true;
+}
+
+function setDuration1(e) {
+  console.log("setDuration1")
+  var len = Math.sqrt(Math.pow(e.pageX - centerx, 2) + Math.pow(centery - e.pageY, 2));
+  if (len <  Math.min(centerx, centery) * 0.9) {
+    duration = Math.atan2(centery - e.pageY, e.pageX - centerx) * -1;
+    if (e.pageX - centerx < 0 && centery - e.pageY > 0) {
+      duration = Math.PI * 2 + duration;
+    }
+    m = (duration + Math.PI / 2) * 15 / Math.PI * 2;
+    console.log("m : %f", m);
+    console.log("m.round : %f", Math.round(m));
+    duration = Math.PI * Math.round(m) / 30 - Math.PI / 2;
+    set_duration = true;
+    document.getElementById( 'sound-file' ).play();
+  } else {
+    set_duration = false;
+  }
 }
 
 function resetDuration(e) {
