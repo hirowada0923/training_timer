@@ -126,13 +126,17 @@ function draw() {
     var s = date.getSeconds();
 
     // 作業時間・休憩時間を描画する
+    angle = Math.PI * (m + s / 60) / 30 - Math.PI / 2;
     if (set_duration == true) {
-      if (Math.PI * (m + s / 60) / 30 - Math.PI / 2 < duration) {
+      if (angle < duration) {
         context.beginPath();
-    		context.fillStyle = circle.duration.color;
-        context.arc(center.x, center.y, radius * circle.inner.radius, Math.PI * (m + s / 60) / 30 - Math.PI / 2, duration, false);
-    		context.lineTo(center.x, center.y)
-    		context.fill();
+    	context.fillStyle = circle.duration.color;
+	if (duration - angle >= Math.PI * 2) {
+          duration = duration - Math.PI * 2
+        }
+        context.arc(center.x, center.y, radius * circle.inner.radius, angle, duration, false);
+    	context.lineTo(center.x, center.y)
+    	context.fill();
       } else {
         play_desk_bell();
         set_duration = false;
