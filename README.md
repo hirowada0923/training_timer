@@ -2,7 +2,9 @@
 Traning Timer
 ====
 
-トレーニングやワークショップで、演習や休憩の時間を簡単に共有するためのWebアナログ時計（イメージをクリックしてアプリを実行）
+トレーニングやワークショップで、演習や休憩の時間を簡単に共有するためのWebアナログ時計
+（イメージをクリックしてアプリを実行）
+
 [![Imgur](https://i.imgur.com/803zVzh.png)](https://hirowada0923.github.io/training_timer/index.html)
 
 ## 概要
