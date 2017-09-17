@@ -1,19 +1,16 @@
-// 文字盤の右側クリックで、5分
-var rest = 5;
-// 文字盤の左側をクリックで、20分
-var work = 20;
-// 文字盤を右クリックで、リセット
-
+/**
+ * @fileoverview アナログ時計、60分以内の作業や休憩の設定が可能
+ * 設定方法：文字盤内の分単位の目盛りのあたりをクリックする
+ * 解除方法：文字盤の外をクリックする
+ * 作業時間、休憩時間が終わるとベルが2回鳴る
+ * macOS Firefox, macOS Chrome, iOS Safariで動作確認済み
+ */
+var canvas = document.getElementById("canvas");
+var center;
 var duration = 0;
-var center1;
-var centerx;
-var centery;
-
 var set_duration = false;
 
-//canvas.addEventListener('click', setDuration, false);
-canvas.addEventListener('click', setDuration1, false);
-canvas.addEventListener('contextmenu', resetDuration, false);
+canvas.addEventListener('click', setDuration, false);
 
 // 時計を毎秒描画する
 $(function() {
@@ -85,24 +82,21 @@ function draw() {
     }
 
     // キャンバスを設定する
-    var canvas = document.getElementById("canvas");
     canvas.width = $(window).width();
     canvas.height = $(window).height();
     var context = canvas.getContext("2d");
-    var center = {
+    center = {
         x: Math.floor(canvas.width / 2),
         y: Math.floor(canvas.height / 2)
     };
-    center1 = center.x;
-    centerx = center.x;
-    centery = center.y;
     var radius = Math.min(center.x, center.y);
     var angle;
     var len;
 
-		context.globalAlpha = 0.9;
+    //　図形の描画の透明度を設定する
+    context.globalAlpha = 0.9;
 
-    // 円を描画する
+    // アナログ時計の枠を円を描画する
     context.beginPath();
     context.fillStyle = circle.outer.color;
     context.arc(center.x, center.y, radius * circle.outer.radius, 0, Math.PI * 2, false);
@@ -112,7 +106,7 @@ function draw() {
     context.arc(center.x, center.y, radius * circle.inner.radius, 0, Math.PI * 2, false);
     context.fill();
 
-    // 目盛りを描画する
+    // アナログ時計の文字盤の目盛りを描画する
     for (var i = 0; i < 60; i++) {
         angle = Math.PI * i / 30;
         context.beginPath();
@@ -132,20 +126,16 @@ function draw() {
 
     // 作業時間・休憩時間を描画する
     angle = Math.PI * (m + s / 60) / 30 - Math.PI / 2;
-//    angle = Math.PI * s / 30 - Math.PI / 2;
-
     if (set_duration == true) {
         if (angle != duration) {
           context.beginPath();
           context.fillStyle = circle.duration.color;
-//          if (duration - angle >= Math.PI * 2) {
-//            duration = duration - Math.PI * 2
-//          }
           context.arc(center.x, center.y, radius * circle.inner.radius, angle, duration, false);
           context.lineTo(center.x, center.y);
           context.fill();
         } else {
-          play_desk_bell();
+          //　タイムアップの音を鳴らす
+          document.getElementById( 'sound-file' ).play();
           set_duration = false;
         }
     }
@@ -185,48 +175,23 @@ function draw() {
 
 }
 
+//　作業時間、休憩時間を設定する
+//　文字盤の目盛り付近をクリックする。必ず分単位になるように、秒単位は四捨五入する
 function setDuration(e) {
-  if (center1 > e.pageX) {
-    interval = work;
-  } else {
-    interval = rest;
-  }
-  var date1 = new Date();
-  var h1 = date1.getHours() % 12;
-  var m1 = date1.getMinutes();
-  var s1 = date1.getSeconds();
-  duration = Math.PI * (m1 + s1 / 60) / 30 - Math.PI / 2 + Math.PI / 30 * interval;
-//  duration = Math.PI * s1 / 30 - Math.PI / 2 + Math.PI / 30 * interval;
-
-  set_duration = true;
-}
-
-function setDuration1(e) {
-  console.log("setDuration1")
-  var len = Math.sqrt(Math.pow(e.pageX - centerx, 2) + Math.pow(centery - e.pageY, 2));
-  if (len <  Math.min(centerx, centery) * 0.9) {
-    duration = Math.atan2(centery - e.pageY, e.pageX - centerx) * -1;
-    if (e.pageX - centerx < 0 && centery - e.pageY > 0) {
+  var len = Math.sqrt(Math.pow(e.pageX - center.x, 2) + Math.pow(center.y - e.pageY, 2));
+  if (len <  Math.min(center.x, center.y) * 0.9) {
+    //　文字盤の内側をクリック
+    duration = Math.atan2(center.y - e.pageY, e.pageX - center.x) * -1;
+    if (e.pageX - center.x < 0 && center.y - e.pageY > 0) {
       duration = Math.PI * 2 + duration;
     }
     m = (duration + Math.PI / 2) * 15 / Math.PI * 2;
-    console.log("m : %f", m);
-    console.log("m.round : %f", Math.round(m));
     duration = Math.PI * Math.round(m) / 30 - Math.PI / 2;
     set_duration = true;
+    // iOSで音声ファイルがロードされない問題に対応
     document.getElementById( 'sound-file' ).load();
   } else {
+    //　文字盤の外側をクリック
     set_duration = false;
   }
-}
-
-function resetDuration(e) {
-  e.preventDefault();
-  duration = 0;
-  set_duration = false
-}
-
-function play_desk_bell()
-{
-	document.getElementById( 'sound-file' ).play();
 }
