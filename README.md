@@ -3,7 +3,7 @@ Traning Timer
 ====
 
 トレーニングやワークショップで、演習や休憩の時間を簡単に共有するためのWebアナログ時計
-![Imgur](https://i.imgur.com/803zVzh.png)
+[![Imgur](https://i.imgur.com/803zVzh.png)](https://hirowada0923.github.io/training_timer/index.html)
 
 ## 概要
 タイムボックスを意識した演習では、参加者は演習に集中して時間管理を忘れてしまうという課題を解決するために作成した
