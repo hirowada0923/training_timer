@@ -13,7 +13,7 @@ Traning Timer
 ## 機能
 - 1〜59分まで分単位で演習や休憩の時間を設定できる
 - 設定した時間を解除できる
-- タイムアップになるとベルを鳴らす
+- タイムアップになるとアラームを7秒鳴らす
 
 ## 利用法
 - [リンク](https://hirowada0923.github.io/training_timer/index.html)を開く
